@@ -1,0 +1,17 @@
+{
+  "name": "jmmusic",
+  "version": "1.0.0",
+  "description": "John Murphy — Official Film Composer Website",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "john-murphy",
+    "film-composer",
+    "soundtracks",
+    "music"
+  ],
+  "author": "robertaworkjr",
+  "license": "ISC"
+}
