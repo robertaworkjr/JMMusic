@@ -230,33 +230,31 @@
     </div>
   </section>
 
-  <!-- Section 5: New Section Placeholder -->
-  <section class="placeholder-section" id="placeholder-section">
+  <!-- Section 5: Interactive Video Sequence (Extended Sequence) -->
+  <section class="placeholder-section sequence-section-interactive" id="placeholder-section">
     <div class="placeholder-container">
       
       <header class="placeholder-header">
-        <span class="placeholder-kicker">05 // SECTION PLACEHOLDER</span>
-        <h2 class="placeholder-title">UPCOMING SECTION</h2>
-        <p class="placeholder-subtitle">Placeholder container ready for your next feature, discography showcase, or media gallery.</p>
+        <span class="placeholder-kicker">05 // ARCHIVAL MOTION PICTURE SEQUENCE</span>
+        <h2 class="placeholder-title">CINEMATIC FRAME SEQUENCE</h2>
+        <p class="placeholder-subtitle">Interactive frame sequence moving horizontally with mouse gestures across John Murphy's cinematic compositions.</p>
       </header>
 
-      <div class="placeholder-content">
-        <div class="placeholder-frame">
-          <div class="placeholder-badge">PLACEHOLDER COMPONENT</div>
-          <p class="placeholder-caption">Content area ready for customization</p>
-          <div class="placeholder-grid-preview">
-            <div class="placeholder-slot">
-              <span class="slot-index">01</span>
-              <span class="slot-label">Content Slot A</span>
-            </div>
-            <div class="placeholder-slot">
-              <span class="slot-index">02</span>
-              <span class="slot-label">Content Slot B</span>
-            </div>
-            <div class="placeholder-slot">
-              <span class="slot-index">03</span>
-              <span class="slot-label">Content Slot C</span>
-            </div>
+      <div class="interactive-scrub-container" id="placeholderScrubContainer">
+        <div class="interactive-scrub-viewport">
+          <video 
+            id="placeholderScrubVideo" 
+            class="scrub-video-inner" 
+            preload="auto" 
+            muted 
+            playsinline 
+            poster="images/HeroImage.png">
+            <source src="video/HeroDistanceCombined.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="sequence-overlay" aria-hidden="true"></div>
+          <div class="sequence-caption">
+            <span class="caption-kicker">EXTENDED SEQUENCE &bull; FRAME BY FRAME</span>
           </div>
         </div>
       </div>
@@ -264,6 +262,6 @@
     </div>
   </section>
 
-  <script src="script.js?v=2.2"></script>
+  <script src="script.js?v=2.3"></script>
 </body>
 </html>
