@@ -617,13 +617,7 @@ html, body {
   transform: translateX(4px);
 }
 
-/* --------------------------------------------------------------------------
-   Section 5: Secondary Interactive Video Sequence Track
-   -------------------------------------------------------------------------- */
-.sequence-track-secondary {
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  z-index: 5;
-}
+
 
 /* --------------------------------------------------------------------------
    Responsive Adjustments

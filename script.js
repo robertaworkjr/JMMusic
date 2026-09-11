@@ -110,9 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(renderLoop);
   }
 
-  // Section 3: HeroCentre video frame scrubber
+  // Section 3: HeroCentre video frame scrubber (woman moving with mouse action)
   initFrameScrubber('sequenceTrack', 'heroCentreVideo', 10);
-
-  // Section 5: HeroDistanceCombined extended sequence scrubber
-  initFrameScrubber('sequenceTrack2', 'placeholderScrubVideo', 30);
 });
