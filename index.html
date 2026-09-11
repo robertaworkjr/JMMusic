@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=2.5">
+  <link rel="stylesheet" href="styles.css?v=2.6">
 </head>
 <body>
   <!-- SECTION 1: Welcome Hero Section (Dedicated video backdrop) -->
@@ -230,38 +230,29 @@
     </div>
   </section>
 
-  <!-- Section 5: Interactive Video Sequence (Extended Sequence) -->
-  <section class="placeholder-section sequence-section-interactive" id="placeholder-section">
-    <div class="placeholder-container">
-      
-      <header class="placeholder-header">
-        <span class="placeholder-kicker">05 // ARCHIVAL MOTION PICTURE SEQUENCE</span>
-        <h2 class="placeholder-title">CINEMATIC FRAME SEQUENCE</h2>
-        <p class="placeholder-subtitle">Interactive frame sequence moving horizontally with mouse gestures across John Murphy's cinematic compositions.</p>
-      </header>
+  <!-- Section 5: Interactive Video Sequence (HeroDistanceCombined) -->
+  <section class="scroll-sequence-track sequence-track-secondary" id="sequenceTrack2">
+    <div class="sticky-video-viewport">
+      <video 
+        id="placeholderScrubVideo" 
+        class="scrub-video" 
+        preload="auto" 
+        muted 
+        playsinline 
+        poster="images/HeroImage.png">
+        <source src="video/HeroDistanceCombined.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
 
-      <div class="interactive-scrub-container" id="placeholderScrubContainer">
-        <div class="interactive-scrub-viewport">
-          <video 
-            id="placeholderScrubVideo" 
-            class="scrub-video-inner" 
-            preload="auto" 
-            muted 
-            playsinline 
-            poster="images/HeroImage.png">
-            <source src="video/HeroDistanceCombined.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-          <div class="sequence-overlay" aria-hidden="true"></div>
-          <div class="sequence-caption">
-            <span class="caption-kicker">EXTENDED SEQUENCE &bull; FRAME BY FRAME</span>
-          </div>
-        </div>
+      <div class="sequence-overlay" aria-hidden="true"></div>
+
+      <!-- Sequence Headline Caption Overlay (Right Aligned) -->
+      <div class="sequence-caption" id="sequenceCaption2">
+        <span class="caption-kicker">ARCHIVAL MOTION PICTURE SEQUENCE</span>
       </div>
-
     </div>
   </section>
 
-  <script src="script.js?v=2.3"></script>
+  <script src="script.js?v=2.4"></script>
 </body>
 </html>

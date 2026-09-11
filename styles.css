@@ -618,97 +618,11 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   Section 5: New Section Placeholder
+   Section 5: Secondary Interactive Video Sequence Track
    -------------------------------------------------------------------------- */
-.placeholder-section {
-  position: relative;
+.sequence-track-secondary {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   z-index: 5;
-  width: 100%;
-  min-height: 100vh;
-  box-sizing: border-box;
-  padding: 6rem 5vw 8rem 8vw;
-  background-color: #050608;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.placeholder-container {
-  max-width: 1300px;
-  margin: 0;
-  width: 100%;
-}
-
-.placeholder-header {
-  max-width: 720px;
-  margin-bottom: 2.5rem;
-}
-
-.placeholder-kicker {
-  display: inline-block;
-  font-family: var(--font-helvetica);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 3.5px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  margin-bottom: 0.6rem;
-}
-
-.placeholder-title {
-  font-family: var(--font-helvetica);
-  font-size: clamp(2rem, 3.8vw, 3.2rem);
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: var(--color-white);
-  margin: 0 0 0.8rem 0;
-  line-height: 1.1;
-}
-
-.placeholder-subtitle {
-  font-family: var(--font-helvetica);
-  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
-  color: rgba(255, 255, 255, 0.65);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.interactive-scrub-container {
-  width: 100%;
-  position: relative;
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background-color: #000000;
-  cursor: ew-resize;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-}
-
-.interactive-scrub-viewport {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: 75vh;
-  min-height: 420px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #000000;
-}
-
-.scrub-video-inner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
-  height: auto;
-  transform: translate(-50%, -50%);
-  object-fit: cover;
-  pointer-events: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -733,13 +647,5 @@ html, body {
 
   .menu-grid {
     grid-template-columns: 1fr;
-  }
-
-  .placeholder-section {
-    padding: 4rem 1.5rem 6rem 1.5rem;
-  }
-
-  .interactive-scrub-viewport {
-    min-height: 240px;
   }
 }

@@ -35,51 +35,77 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 2. Mouse Move Left-to-Right Frame Scrubber for HeroCentre.mp4
-  // Moving mouse from left to right scrubs through frames while staying in section
+  // 2. Interactive Frame Scrubber Engine
+  // Moving mouse horizontally left-to-right across track scrubs video frames
   // =========================================================================
-  const sequenceTrack = document.getElementById('sequenceTrack');
-  const heroCentreVideo = document.getElementById('heroCentreVideo');
+  function initFrameScrubber(trackId, videoId, defaultDuration) {
+    const track = document.getElementById(trackId);
+    const video = document.getElementById(videoId);
 
-  if (heroCentreVideo && sequenceTrack) {
-    // Ensure video is explicitly paused (never plays automatically)
-    heroCentreVideo.pause();
-    heroCentreVideo.muted = true;
-    heroCentreVideo.defaultMuted = true;
+    if (!track || !video) return;
 
+    video.muted = true;
+    video.defaultMuted = true;
+    video.pause();
+
+    let videoDuration = defaultDuration || 10;
     let targetTime = 0;
-    let videoDuration = 10; // Fallback to 10s until metadata resolves
+    let isSeeking = false;
 
-    heroCentreVideo.addEventListener('loadedmetadata', () => {
-      if (heroCentreVideo.duration && !isNaN(heroCentreVideo.duration)) {
-        videoDuration = heroCentreVideo.duration;
+    const onMeta = () => {
+      if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+        videoDuration = video.duration;
       }
-    });
+      try {
+        video.currentTime = 0.001;
+      } catch (_) {}
+    };
 
-    // Map horizontal mouse position (X) across container to timeline (0.0 to 1.0)
-    function handleHorizontalScrub(clientX) {
-      const rect = sequenceTrack.getBoundingClientRect();
+    video.addEventListener('loadedmetadata', onMeta);
+    video.addEventListener('durationchange', onMeta);
+    video.addEventListener('canplay', onMeta);
+
+    if (video.readyState >= 1) {
+      onMeta();
+    }
+
+    function handleScrub(clientX) {
+      const rect = track.getBoundingClientRect();
+      if (rect.width <= 0) return;
       const x = clientX - rect.left;
       const progress = Math.max(0, Math.min(1, x / rect.width));
       targetTime = progress * videoDuration;
     }
 
-    sequenceTrack.addEventListener('mousemove', (e) => {
-      handleHorizontalScrub(e.clientX);
+    track.addEventListener('mousemove', (e) => {
+      handleScrub(e.clientX);
     });
 
-    sequenceTrack.addEventListener('touchmove', (e) => {
+    track.addEventListener('touchmove', (e) => {
       if (e.touches && e.touches.length > 0) {
-        handleHorizontalScrub(e.touches[0].clientX);
+        handleScrub(e.touches[0].clientX);
       }
     }, { passive: true });
 
-    // Smooth render loop using requestAnimationFrame
+    track.addEventListener('click', (e) => {
+      handleScrub(e.clientX);
+    });
+
+    video.addEventListener('seeking', () => {
+      isSeeking = true;
+    });
+
+    video.addEventListener('seeked', () => {
+      isSeeking = false;
+    });
+
     function renderLoop() {
-      if (heroCentreVideo.readyState >= 2) {
-        const diff = targetTime - heroCentreVideo.currentTime;
-        if (Math.abs(diff) > 0.012) {
-          heroCentreVideo.currentTime += diff * 0.35;
+      if (!isSeeking && (video.readyState >= 1 || video.duration > 0)) {
+        const diff = targetTime - video.currentTime;
+        if (Math.abs(diff) > 0.02) {
+          try {
+            video.currentTime += diff * 0.4;
+          } catch (_) {}
         }
       }
       requestAnimationFrame(renderLoop);
@@ -88,55 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(renderLoop);
   }
 
-  // =========================================================================
-  // 3. Section 5: Mouse Move Frame Scrubber for Extended Sequence Video
-  // Moving mouse horizontally across container scrubs static frames
-  // =========================================================================
-  const placeholderScrubContainer = document.getElementById('placeholderScrubContainer');
-  const placeholderScrubVideo = document.getElementById('placeholderScrubVideo');
+  // Section 3: HeroCentre video frame scrubber
+  initFrameScrubber('sequenceTrack', 'heroCentreVideo', 10);
 
-  if (placeholderScrubVideo && placeholderScrubContainer) {
-    // Ensure video is explicitly paused (frames are static until moved)
-    placeholderScrubVideo.pause();
-    placeholderScrubVideo.muted = true;
-    placeholderScrubVideo.defaultMuted = true;
-
-    let targetTimeSec5 = 0;
-    let videoDurationSec5 = 20; // Default fallback duration
-
-    placeholderScrubVideo.addEventListener('loadedmetadata', () => {
-      if (placeholderScrubVideo.duration && !isNaN(placeholderScrubVideo.duration)) {
-        videoDurationSec5 = placeholderScrubVideo.duration;
-      }
-    });
-
-    function handleSec5Scrub(clientX) {
-      const rect = placeholderScrubContainer.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const progress = Math.max(0, Math.min(1, x / rect.width));
-      targetTimeSec5 = progress * videoDurationSec5;
-    }
-
-    placeholderScrubContainer.addEventListener('mousemove', (e) => {
-      handleSec5Scrub(e.clientX);
-    });
-
-    placeholderScrubContainer.addEventListener('touchmove', (e) => {
-      if (e.touches && e.touches.length > 0) {
-        handleSec5Scrub(e.touches[0].clientX);
-      }
-    }, { passive: true });
-
-    function renderLoopSec5() {
-      if (placeholderScrubVideo.readyState >= 2) {
-        const diff = targetTimeSec5 - placeholderScrubVideo.currentTime;
-        if (Math.abs(diff) > 0.012) {
-          placeholderScrubVideo.currentTime += diff * 0.35;
-        }
-      }
-      requestAnimationFrame(renderLoopSec5);
-    }
-
-    requestAnimationFrame(renderLoopSec5);
-  }
+  // Section 5: HeroDistanceCombined extended sequence scrubber
+  initFrameScrubber('sequenceTrack2', 'placeholderScrubVideo', 30);
 });
