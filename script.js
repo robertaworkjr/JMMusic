@@ -35,88 +35,56 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 2. Instant 1:1 Zero-Delay Frame Scrubber Engine
-  // - Direct 1:1 cursor-to-frame tracking with zero lag/inertia delay
-  // - Snaps directly to exact 24fps frames
-  // - Batches via requestAnimationFrame to eliminate pointer jitter
-  // - Halts seeking completely when stationary to guarantee zero shimmer
+  // 2. Mouse Move Left-to-Right Frame Scrubber for HeroCentre.mp4
+  // Moving mouse from left to right scrubs through frames while staying in section
   // =========================================================================
-  function initFrameScrubber(trackId, videoId, fps = 24) {
-    const track = document.getElementById(trackId);
-    const video = document.getElementById(videoId);
+  const sequenceTrack = document.getElementById('sequenceTrack');
+  const heroCentreVideo = document.getElementById('heroCentreVideo');
 
-    if (!track || !video) return;
+  if (heroCentreVideo && sequenceTrack) {
+    // Ensure video is explicitly paused (never plays automatically)
+    heroCentreVideo.pause();
+    heroCentreVideo.muted = true;
+    heroCentreVideo.defaultMuted = true;
 
-    video.muted = true;
-    video.defaultMuted = true;
-    video.volume = 0;
-    video.pause();
+    let targetTime = 0;
+    let videoDuration = 10; // Fallback to 10s until metadata resolves
 
-    let totalFrames = 240; // 10s @ 24fps
-    let currentRenderedFrame = -1;
-    let targetProgress = 0;
-    let rafActive = false;
-
-    const computeFrames = () => {
-      if (video.duration && !isNaN(video.duration) && video.duration > 0) {
-        totalFrames = Math.max(1, Math.round(video.duration * fps));
+    heroCentreVideo.addEventListener('loadedmetadata', () => {
+      if (heroCentreVideo.duration && !isNaN(heroCentreVideo.duration)) {
+        videoDuration = heroCentreVideo.duration;
       }
-      if (currentRenderedFrame === -1) {
-        currentRenderedFrame = 0;
-        try {
-          video.currentTime = 0.001;
-        } catch (_) {}
-      }
-    };
-
-    video.addEventListener('loadedmetadata', computeFrames);
-    video.addEventListener('durationchange', computeFrames);
-    video.addEventListener('canplay', computeFrames);
-
-    if (video.readyState >= 1) {
-      computeFrames();
-    }
-
-    function renderFrame() {
-      rafActive = false;
-      const frameIndex = Math.min(totalFrames - 1, Math.max(0, Math.round(targetProgress * (totalFrames - 1))));
-
-      if (frameIndex !== currentRenderedFrame && (video.readyState >= 1 || video.duration > 0)) {
-        currentRenderedFrame = frameIndex;
-        try {
-          // Direct 1:1 seek to exact frame timestamp with zero delay
-          video.currentTime = currentRenderedFrame / fps;
-        } catch (_) {}
-      }
-    }
-
-    function onPointerMove(clientX) {
-      const rect = track.getBoundingClientRect();
-      if (rect.width <= 0) return;
-      const x = clientX - rect.left;
-      targetProgress = Math.max(0, Math.min(1, x / rect.width));
-
-      if (!rafActive) {
-        rafActive = true;
-        requestAnimationFrame(renderFrame);
-      }
-    }
-
-    track.addEventListener('mousemove', (e) => {
-      onPointerMove(e.clientX);
-    }, { passive: true });
-
-    track.addEventListener('touchmove', (e) => {
-      if (e.touches && e.touches.length > 0) {
-        onPointerMove(e.touches[0].clientX);
-      }
-    }, { passive: true });
-
-    track.addEventListener('click', (e) => {
-      onPointerMove(e.clientX);
     });
-  }
 
-  // Section 3: HeroCentre video frame scrubber (woman moving with mouse action)
-  initFrameScrubber('sequenceTrack', 'heroCentreVideo', 24);
+    // Map horizontal mouse position (X) across container to timeline (0.0 to 1.0)
+    function handleHorizontalScrub(clientX) {
+      const rect = sequenceTrack.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const progress = Math.max(0, Math.min(1, x / rect.width));
+      targetTime = progress * videoDuration;
+    }
+
+    sequenceTrack.addEventListener('mousemove', (e) => {
+      handleHorizontalScrub(e.clientX);
+    });
+
+    sequenceTrack.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        handleHorizontalScrub(e.touches[0].clientX);
+      }
+    }, { passive: true });
+
+    // Smooth render loop using requestAnimationFrame
+    function renderLoop() {
+      if (heroCentreVideo.readyState >= 2) {
+        const diff = targetTime - heroCentreVideo.currentTime;
+        if (Math.abs(diff) > 0.012) {
+          heroCentreVideo.currentTime += diff * 0.35;
+        }
+      }
+      requestAnimationFrame(renderLoop);
+    }
+
+    requestAnimationFrame(renderLoop);
+  }
 });

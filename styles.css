@@ -434,11 +434,9 @@ html, body {
   min-height: 100%;
   width: auto;
   height: auto;
-  transform: translate3d(-50%, -50%, 0);
+  transform: translate(-50%, -50%);
   object-fit: cover;
   pointer-events: none;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .sequence-overlay {
@@ -492,7 +490,6 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .menu-container {
@@ -618,8 +615,6 @@ html, body {
   color: var(--color-white);
   transform: translateX(4px);
 }
-
-
 
 /* --------------------------------------------------------------------------
    Responsive Adjustments
