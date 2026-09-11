@@ -35,10 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 2. Solid, Non-Shimmering Frame Scrubber Engine
-  // - Snaps directly to discrete 24fps presentation frames
-  // - Halts seeking completely when mouse is stationary (eliminates shimmering/flicker)
-  // - Responds instantly and cleanly to horizontal mouse movements
+  // 2. Silky-Smooth Inertia Frame Scrubber Engine
+  // - Interpolates mouse movement with smooth inertia to eliminate micro-jitter
+  // - Snaps cleanly to discrete 24fps frames
+  // - Automatically halts all seeking when stationary to prevent any shimmering
   // =========================================================================
   function initFrameScrubber(trackId, videoId, fps = 24) {
     const track = document.getElementById(trackId);
@@ -51,17 +51,19 @@ document.addEventListener('DOMContentLoaded', () => {
     video.volume = 0;
     video.pause();
 
-    let totalFrames = 240; // 10s @ 24fps default
-    let currentFrame = -1;
-    let targetFrame = 0;
-    let rafScheduled = false;
+    let totalFrames = 240; // 10s @ 24fps
+    let targetProgress = 0;
+    let currentProgress = 0;
+    let currentRenderedFrame = -1;
+    let isMoving = false;
+    let rafActive = false;
 
     const computeFrames = () => {
       if (video.duration && !isNaN(video.duration) && video.duration > 0) {
         totalFrames = Math.max(1, Math.round(video.duration * fps));
       }
-      if (currentFrame === -1) {
-        currentFrame = 0;
+      if (currentRenderedFrame === -1) {
+        currentRenderedFrame = 0;
         try {
           video.currentTime = 0.001;
         } catch (_) {}
@@ -76,45 +78,68 @@ document.addEventListener('DOMContentLoaded', () => {
       computeFrames();
     }
 
-    function applySeek() {
-      rafScheduled = false;
-      if (targetFrame !== currentFrame && (video.readyState >= 1 || video.duration > 0)) {
-        currentFrame = targetFrame;
-        try {
-          // Seek directly to exact frame timestamp
-          video.currentTime = currentFrame / fps;
-        } catch (_) {}
+    function renderStep() {
+      if (!isMoving) {
+        rafActive = false;
+        return;
+      }
+
+      const diff = targetProgress - currentProgress;
+
+      if (Math.abs(diff) > 0.0008) {
+        // Smooth cinematic glide (0.24 gives a tactile, responsive feel without jitter)
+        currentProgress += diff * 0.24;
+        const frameIndex = Math.min(totalFrames - 1, Math.max(0, Math.round(currentProgress * (totalFrames - 1))));
+
+        if (frameIndex !== currentRenderedFrame && (video.readyState >= 1 || video.duration > 0)) {
+          currentRenderedFrame = frameIndex;
+          try {
+            video.currentTime = currentRenderedFrame / fps;
+          } catch (_) {}
+        }
+        requestAnimationFrame(renderStep);
+      } else {
+        // Settle completely onto final target frame - halt all seeking
+        currentProgress = targetProgress;
+        const frameIndex = Math.min(totalFrames - 1, Math.max(0, Math.round(currentProgress * (totalFrames - 1))));
+        if (frameIndex !== currentRenderedFrame && (video.readyState >= 1 || video.duration > 0)) {
+          currentRenderedFrame = frameIndex;
+          try {
+            video.currentTime = currentRenderedFrame / fps;
+          } catch (_) {}
+        }
+        isMoving = false;
+        rafActive = false;
       }
     }
 
-    function handlePointerScrub(clientX) {
+    function onPointerMove(clientX) {
       const rect = track.getBoundingClientRect();
       if (rect.width <= 0) return;
       const x = clientX - rect.left;
-      const progress = Math.max(0, Math.min(1, x / rect.width));
-      const nextFrame = Math.min(totalFrames - 1, Math.max(0, Math.round(progress * (totalFrames - 1))));
+      targetProgress = Math.max(0, Math.min(1, x / rect.width));
 
-      if (nextFrame !== targetFrame) {
-        targetFrame = nextFrame;
-        if (!rafScheduled) {
-          rafScheduled = true;
-          requestAnimationFrame(applySeek);
+      if (!isMoving) {
+        isMoving = true;
+        if (!rafActive) {
+          rafActive = true;
+          requestAnimationFrame(renderStep);
         }
       }
     }
 
     track.addEventListener('mousemove', (e) => {
-      handlePointerScrub(e.clientX);
+      onPointerMove(e.clientX);
     }, { passive: true });
 
     track.addEventListener('touchmove', (e) => {
       if (e.touches && e.touches.length > 0) {
-        handlePointerScrub(e.touches[0].clientX);
+        onPointerMove(e.touches[0].clientX);
       }
     }, { passive: true });
 
     track.addEventListener('click', (e) => {
-      handlePointerScrub(e.clientX);
+      onPointerMove(e.clientX);
     });
   }
 
