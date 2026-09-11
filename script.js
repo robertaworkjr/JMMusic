@@ -91,20 +91,16 @@ document.addEventListener('DOMContentLoaded', () => {
       handleScrub(e.clientX);
     });
 
-    video.addEventListener('seeking', () => {
-      isSeeking = true;
-    });
-
-    video.addEventListener('seeked', () => {
-      isSeeking = false;
-    });
+    let lastSeekTime = 0;
 
     function renderLoop() {
-      if (!isSeeking && (video.readyState >= 1 || video.duration > 0)) {
+      const now = performance.now();
+      if ((video.readyState >= 1 || video.duration > 0) && (now - lastSeekTime > 20)) {
         const diff = targetTime - video.currentTime;
-        if (Math.abs(diff) > 0.02) {
+        if (Math.abs(diff) > 0.012) {
           try {
-            video.currentTime += diff * 0.4;
+            video.currentTime += diff * 0.5;
+            lastSeekTime = now;
           } catch (_) {}
         }
       }
