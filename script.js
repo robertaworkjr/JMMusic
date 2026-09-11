@@ -35,10 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 2. Silky-Smooth Inertia Frame Scrubber Engine
-  // - Interpolates mouse movement with smooth inertia to eliminate micro-jitter
-  // - Snaps cleanly to discrete 24fps frames
-  // - Automatically halts all seeking when stationary to prevent any shimmering
+  // 2. Instant 1:1 Zero-Delay Frame Scrubber Engine
+  // - Direct 1:1 cursor-to-frame tracking with zero lag/inertia delay
+  // - Snaps directly to exact 24fps frames
+  // - Batches via requestAnimationFrame to eliminate pointer jitter
+  // - Halts seeking completely when stationary to guarantee zero shimmer
   // =========================================================================
   function initFrameScrubber(trackId, videoId, fps = 24) {
     const track = document.getElementById(trackId);
@@ -52,10 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
     video.pause();
 
     let totalFrames = 240; // 10s @ 24fps
-    let targetProgress = 0;
-    let currentProgress = 0;
     let currentRenderedFrame = -1;
-    let isMoving = false;
+    let targetProgress = 0;
     let rafActive = false;
 
     const computeFrames = () => {
@@ -78,38 +77,16 @@ document.addEventListener('DOMContentLoaded', () => {
       computeFrames();
     }
 
-    function renderStep() {
-      if (!isMoving) {
-        rafActive = false;
-        return;
-      }
+    function renderFrame() {
+      rafActive = false;
+      const frameIndex = Math.min(totalFrames - 1, Math.max(0, Math.round(targetProgress * (totalFrames - 1))));
 
-      const diff = targetProgress - currentProgress;
-
-      if (Math.abs(diff) > 0.0008) {
-        // Smooth cinematic glide (0.24 gives a tactile, responsive feel without jitter)
-        currentProgress += diff * 0.24;
-        const frameIndex = Math.min(totalFrames - 1, Math.max(0, Math.round(currentProgress * (totalFrames - 1))));
-
-        if (frameIndex !== currentRenderedFrame && (video.readyState >= 1 || video.duration > 0)) {
-          currentRenderedFrame = frameIndex;
-          try {
-            video.currentTime = currentRenderedFrame / fps;
-          } catch (_) {}
-        }
-        requestAnimationFrame(renderStep);
-      } else {
-        // Settle completely onto final target frame - halt all seeking
-        currentProgress = targetProgress;
-        const frameIndex = Math.min(totalFrames - 1, Math.max(0, Math.round(currentProgress * (totalFrames - 1))));
-        if (frameIndex !== currentRenderedFrame && (video.readyState >= 1 || video.duration > 0)) {
-          currentRenderedFrame = frameIndex;
-          try {
-            video.currentTime = currentRenderedFrame / fps;
-          } catch (_) {}
-        }
-        isMoving = false;
-        rafActive = false;
+      if (frameIndex !== currentRenderedFrame && (video.readyState >= 1 || video.duration > 0)) {
+        currentRenderedFrame = frameIndex;
+        try {
+          // Direct 1:1 seek to exact frame timestamp with zero delay
+          video.currentTime = currentRenderedFrame / fps;
+        } catch (_) {}
       }
     }
 
@@ -119,12 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const x = clientX - rect.left;
       targetProgress = Math.max(0, Math.min(1, x / rect.width));
 
-      if (!isMoving) {
-        isMoving = true;
-        if (!rafActive) {
-          rafActive = true;
-          requestAnimationFrame(renderStep);
-        }
+      if (!rafActive) {
+        rafActive = true;
+        requestAnimationFrame(renderFrame);
       }
     }
 
