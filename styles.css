@@ -490,6 +490,7 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .menu-container {
@@ -617,6 +618,137 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
+   Section 5: New Section Placeholder
+   -------------------------------------------------------------------------- */
+.placeholder-section {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 6rem 5vw 8rem 8vw;
+  background-color: #050608;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.placeholder-container {
+  max-width: 1300px;
+  margin: 0;
+  width: 100%;
+}
+
+.placeholder-header {
+  max-width: 720px;
+  margin-bottom: 2.5rem;
+}
+
+.placeholder-kicker {
+  display: inline-block;
+  font-family: var(--font-helvetica);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 0.6rem;
+}
+
+.placeholder-title {
+  font-family: var(--font-helvetica);
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-white);
+  margin: 0 0 0.8rem 0;
+  line-height: 1.1;
+}
+
+.placeholder-subtitle {
+  font-family: var(--font-helvetica);
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.placeholder-content {
+  width: 100%;
+}
+
+.placeholder-frame {
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  padding: clamp(2rem, 4vw, 3.5rem);
+  background: rgba(255, 255, 255, 0.015);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.placeholder-badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+  font-family: var(--font-helvetica);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.placeholder-caption {
+  font-family: var(--font-helvetica);
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+
+.placeholder-grid-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.placeholder-slot {
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  padding: 2.2rem 1.8rem;
+  background: rgba(255, 255, 255, 0.01);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.placeholder-slot:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.slot-index {
+  font-family: var(--font-helvetica);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.slot-label {
+  font-family: var(--font-helvetica);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* --------------------------------------------------------------------------
    Responsive Adjustments
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
@@ -637,6 +769,14 @@ html, body {
   }
 
   .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .placeholder-section {
+    padding: 4rem 1.5rem 6rem 1.5rem;
+  }
+
+  .placeholder-grid-preview {
     grid-template-columns: 1fr;
   }
 }
