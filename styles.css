@@ -434,9 +434,11 @@ html, body {
   min-height: 100%;
   width: auto;
   height: auto;
-  transform: translate(-50%, -50%);
+  transform: translate3d(-50%, -50%, 0);
   object-fit: cover;
   pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .sequence-overlay {

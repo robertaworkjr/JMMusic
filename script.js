@@ -35,10 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 2. Interactive Frame Scrubber Engine
-  // Moving mouse horizontally left-to-right across track scrubs video frames
+  // 2. Solid, Non-Shimmering Frame Scrubber Engine
+  // - Snaps directly to discrete 24fps presentation frames
+  // - Halts seeking completely when mouse is stationary (eliminates shimmering/flicker)
+  // - Responds instantly and cleanly to horizontal mouse movements
   // =========================================================================
-  function initFrameScrubber(trackId, videoId, defaultDuration) {
+  function initFrameScrubber(trackId, videoId, fps = 24) {
     const track = document.getElementById(trackId);
     const video = document.getElementById(videoId);
 
@@ -46,70 +48,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
     video.muted = true;
     video.defaultMuted = true;
+    video.volume = 0;
     video.pause();
 
-    let videoDuration = defaultDuration || 10;
-    let targetTime = 0;
-    let isSeeking = false;
+    let totalFrames = 240; // 10s @ 24fps default
+    let currentFrame = -1;
+    let targetFrame = 0;
+    let rafScheduled = false;
 
-    const onMeta = () => {
+    const computeFrames = () => {
       if (video.duration && !isNaN(video.duration) && video.duration > 0) {
-        videoDuration = video.duration;
+        totalFrames = Math.max(1, Math.round(video.duration * fps));
       }
-      try {
-        video.currentTime = 0.001;
-      } catch (_) {}
+      if (currentFrame === -1) {
+        currentFrame = 0;
+        try {
+          video.currentTime = 0.001;
+        } catch (_) {}
+      }
     };
 
-    video.addEventListener('loadedmetadata', onMeta);
-    video.addEventListener('durationchange', onMeta);
-    video.addEventListener('canplay', onMeta);
+    video.addEventListener('loadedmetadata', computeFrames);
+    video.addEventListener('durationchange', computeFrames);
+    video.addEventListener('canplay', computeFrames);
 
     if (video.readyState >= 1) {
-      onMeta();
+      computeFrames();
     }
 
-    function handleScrub(clientX) {
+    function applySeek() {
+      rafScheduled = false;
+      if (targetFrame !== currentFrame && (video.readyState >= 1 || video.duration > 0)) {
+        currentFrame = targetFrame;
+        try {
+          // Seek directly to exact frame timestamp
+          video.currentTime = currentFrame / fps;
+        } catch (_) {}
+      }
+    }
+
+    function handlePointerScrub(clientX) {
       const rect = track.getBoundingClientRect();
       if (rect.width <= 0) return;
       const x = clientX - rect.left;
       const progress = Math.max(0, Math.min(1, x / rect.width));
-      targetTime = progress * videoDuration;
+      const nextFrame = Math.min(totalFrames - 1, Math.max(0, Math.round(progress * (totalFrames - 1))));
+
+      if (nextFrame !== targetFrame) {
+        targetFrame = nextFrame;
+        if (!rafScheduled) {
+          rafScheduled = true;
+          requestAnimationFrame(applySeek);
+        }
+      }
     }
 
     track.addEventListener('mousemove', (e) => {
-      handleScrub(e.clientX);
-    });
+      handlePointerScrub(e.clientX);
+    }, { passive: true });
 
     track.addEventListener('touchmove', (e) => {
       if (e.touches && e.touches.length > 0) {
-        handleScrub(e.touches[0].clientX);
+        handlePointerScrub(e.touches[0].clientX);
       }
     }, { passive: true });
 
     track.addEventListener('click', (e) => {
-      handleScrub(e.clientX);
+      handlePointerScrub(e.clientX);
     });
-
-    let lastSeekTime = 0;
-
-    function renderLoop() {
-      const now = performance.now();
-      if ((video.readyState >= 1 || video.duration > 0) && (now - lastSeekTime > 20)) {
-        const diff = targetTime - video.currentTime;
-        if (Math.abs(diff) > 0.012) {
-          try {
-            video.currentTime += diff * 0.5;
-            lastSeekTime = now;
-          } catch (_) {}
-        }
-      }
-      requestAnimationFrame(renderLoop);
-    }
-
-    requestAnimationFrame(renderLoop);
   }
 
   // Section 3: HeroCentre video frame scrubber (woman moving with mouse action)
-  initFrameScrubber('sequenceTrack', 'heroCentreVideo', 10);
+  initFrameScrubber('sequenceTrack', 'heroCentreVideo', 24);
 });
